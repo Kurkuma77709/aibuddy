@@ -51,7 +51,6 @@
 
     /* Улучшенные медиа-запросы для мобильных устройств */
     @media (max-width: 768px) {
-      /* Шрифты */
       .text-6xl { font-size: 1.5rem !important; }
       .text-8xl { font-size: 2rem !important; }
       .text-4xl { font-size: 1.2rem !important; }
@@ -60,13 +59,11 @@
       .text-2xl { font-size: 1rem !important; }
       .text-lg { font-size: 0.85rem !important; }
 
-      /* Общие настройки */
       .min-h-screen { min-height: 100vh; }
       .px-6 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
       .py-20 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
       .max-w-4xl, .max-w-6xl { max-width: 100% !important; margin: 0 !important; }
 
-      /* Навигация */
       .navbar {
         flex-direction: column !important;
         padding: 1rem 0.5rem !important;
@@ -79,7 +76,6 @@
         font-size: 0.9rem !important;
       }
 
-      /* Герой */
       #главная .text-center { padding: 0 0.5rem; }
       #главная h1 { line-height: 1.2; }
       #главная a {
@@ -90,34 +86,37 @@
       }
       #главная .max-w-2xl { max-width: 90% !important; }
 
-      /* Возможности */
       .grid-cols-1.md\:grid-cols-3 { grid-template-columns: 1fr !important; }
       .glass { padding: 0.75rem !important; margin: 0.5rem 0 !important; }
 
-      /* Как это работает */
       .step-icon { left: -25px; font-size: 1.5rem; }
       .glass { padding: 0.75rem !important; margin-left: 1.5rem !important; }
       .timeline { left: 10px; }
       .flex.items-center { flex-direction: column !important; align-items: flex-start !important; }
       .glass p { margin: 0 !important; }
 
-      /* Отзывы */
       .flex-wrap { flex-direction: column !important; }
       .gap-8 { gap: 0.5rem !important; }
       .max-w-sm { max-width: 100% !important; margin: 0.5rem 0 !important; }
 
-      /* Футер */
       .py-10 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
       .mt-4 { margin-top: 0.5rem !important; }
+
+      /* Новая секция с кнопками */
+      .button-section .glass {
+        padding: 0.5rem !important;
+        margin: 0.25rem 0 !important;
+        text-align: center;
+      }
     }
 
-    /* Дополнительные настройки для очень маленьких экранов (< 480px) */
     @media (max-width: 480px) {
       .text-6xl { font-size: 1.2rem !important; }
       .text-8xl { font-size: 1.5rem !important; }
       #главная a { padding: 0.4rem 0.8rem !important; }
       .step-icon { left: -20px; font-size: 1.2rem; }
       .glass { padding: 0.5rem !important; margin-left: 1rem !important; }
+      .button-section .glass { padding: 0.4rem !important; font-size: 0.8rem !important; }
     }
   </style>
 </head>
@@ -170,7 +169,7 @@
             AIBuddy
           </motion.div>
           <div className="space-x-6">
-            {['Главная', 'Возможности', 'Как это работает', 'Отзывы'].map((item) => (
+            {['Главная', 'Возможности', 'Как это работает', 'Что умеет', 'Отзывы'].map((item) => (
               <motion.a
                 key={item}
                 href={`#${item.toLowerCase().replace(' ', '-')}`}
@@ -321,6 +320,42 @@
       );
     };
 
+    const WhatItCanDo = () => {
+      const capabilities = [
+        { title: "Поэтическая проза", description: "Создавайте душевные истории, яркие стихи и увлекательные статьи с ноткой литературного волшебства.", icon: "📜" },
+        { title: "Магия кода", description: "Генерируйте чистый, масштабируемый код на Python, JavaScript, C++ и других языках для любых проектов.", icon: "💻" },
+      ];
+
+      return (
+        <section id="что-умеет" className="py-20 px-6">
+          <motion.h2
+            initial={window.framerMotion ? { opacity: 0 } : {}}
+            whileInView={window.framerMotion ? { opacity: 1 } : {}}
+            transition={window.framerMotion ? { duration: 0.8 } : {}}
+            className="text-4xl md:text-5xl font-bold text-center mb-12"
+          >
+            Познакомьтесь с AIBuddy знает
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto button-section">
+            {capabilities.map((capability, index) => (
+              <motion.div
+                key={capability.title}
+                initial={window.framerMotion ? { opacity: 0, y: 50 } : {}}
+                whileInView={window.framerMotion ? { opacity: 1, y: 0 } : {}}
+                transition={window.framerMotion ? { duration: 0.5, delay: index * 0.2 } : {}}
+                whileHover={window.framerMotion ? { scale: 1.05, boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)" } : {}}
+                className="glass p-6 rounded-xl text-center"
+              >
+                <div className="text-4xl mb-4">{capability.icon}</div>
+                <h3 className="text-2xl font-semibold mb-4">{capability.title}</h3>
+                <p className="text-lg" dangerouslySetInnerHTML={{ __html: capability.description }} />
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      );
+    };
+
     const Testimonials = () => {
       const testimonials = [
         {
@@ -397,6 +432,7 @@
             <Hero />
             <Features />
             <HowItWorks />
+            <WhatItCanDo />
             <Testimonials />
             <Footer />
           </div>

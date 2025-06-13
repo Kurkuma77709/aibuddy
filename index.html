@@ -16,6 +16,7 @@
       background: linear-gradient(135deg, #1a0933, #2e1a47);
       color: white;
       overflow-x: hidden;
+      margin: 0;
     }
     .glow {
       box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
@@ -48,34 +49,75 @@
       z-index: 10;
     }
 
-    /* Медиа-запросы для мобильных устройств (до 768px) */
+    /* Улучшенные медиа-запросы для мобильных устройств */
     @media (max-width: 768px) {
-      .text-6xl, .text-8xl { font-size: 2rem !important; }
-      .text-4xl, .text-5xl { font-size: 1.5rem !important; }
-      .text-xl, .text-2xl { font-size: 1rem !important; }
-      .text-lg { font-size: 0.9rem !important; }
+      /* Шрифты */
+      .text-6xl { font-size: 1.5rem !important; }
+      .text-8xl { font-size: 2rem !important; }
+      .text-4xl { font-size: 1.2rem !important; }
+      .text-5xl { font-size: 1.4rem !important; }
+      .text-xl { font-size: 0.9rem !important; }
+      .text-2xl { font-size: 1rem !important; }
+      .text-lg { font-size: 0.85rem !important; }
 
+      /* Общие настройки */
       .min-h-screen { min-height: 100vh; }
-      .px-6 { padding-left: 1rem !important; padding-right: 1rem !important; }
-      .py-20 { padding-top: 1.5rem !important; padding-bottom: 1.5rem !important; }
-      .max-w-4xl, .max-w-6xl { max-width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; }
+      .px-6 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+      .py-20 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
+      .max-w-4xl, .max-w-6xl { max-width: 100% !important; margin: 0 !important; }
 
+      /* Навигация */
+      .navbar {
+        flex-direction: column !important;
+        padding: 1rem 0.5rem !important;
+        text-align: center;
+      }
+      .navbar div { margin-top: 0.5rem; }
+      .navbar a {
+        display: block;
+        margin: 0.5rem 0 !important;
+        font-size: 0.9rem !important;
+      }
+
+      /* Герой */
+      #главная .text-center { padding: 0 0.5rem; }
+      #главная h1 { line-height: 1.2; }
+      #главная a {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.9rem !important;
+        width: 100%;
+        text-align: center;
+      }
+      #главная .max-w-2xl { max-width: 90% !important; }
+
+      /* Возможности */
       .grid-cols-1.md\:grid-cols-3 { grid-template-columns: 1fr !important; }
-      .flex-wrap { flex-direction: column !important; }
-      .gap-8 { gap: 1rem !important; }
+      .glass { padding: 0.75rem !important; margin: 0.5rem 0 !important; }
 
-      .navbar { flex-direction: column !important; text-align: center; }
-      .navbar div { margin-top: 1rem; }
-      .navbar a { margin: 0 0.5rem !important; }
-
-      #главная .text-center { padding: 0 1rem; }
-      #главная a { padding: 0.5rem 1rem !important; font-size: 1rem !important; }
-
-      .step-icon { left: -30px; font-size: 1.5rem; }
-      .glass { padding: 1rem !important; margin-left: 2rem !important; }
+      /* Как это работает */
+      .step-icon { left: -25px; font-size: 1.5rem; }
+      .glass { padding: 0.75rem !important; margin-left: 1.5rem !important; }
       .timeline { left: 10px; }
+      .flex.items-center { flex-direction: column !important; align-items: flex-start !important; }
+      .glass p { margin: 0 !important; }
 
-      .max-w-sm { max-width: 100% !important; }
+      /* Отзывы */
+      .flex-wrap { flex-direction: column !important; }
+      .gap-8 { gap: 0.5rem !important; }
+      .max-w-sm { max-width: 100% !important; margin: 0.5rem 0 !important; }
+
+      /* Футер */
+      .py-10 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+      .mt-4 { margin-top: 0.5rem !important; }
+    }
+
+    /* Дополнительные настройки для очень маленьких экранов (< 480px) */
+    @media (max-width: 480px) {
+      .text-6xl { font-size: 1.2rem !important; }
+      .text-8xl { font-size: 1.5rem !important; }
+      #главная a { padding: 0.4rem 0.8rem !important; }
+      .step-icon { left: -20px; font-size: 1.2rem; }
+      .glass { padding: 0.5rem !important; margin-left: 1rem !important; }
     }
   </style>
 </head>

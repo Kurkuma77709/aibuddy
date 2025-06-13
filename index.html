@@ -1,452 +1,637 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIBuddy - Ваш Креативный ИИ-Помощник</title>
-  <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" defer></script>
-  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js" defer></script>
-  <script src="https://unpkg.com/@babel/standalone@7.22.9/babel.min.js" defer></script>
-  <script src="https://unpkg.com/framer-motion@10.18.0/dist/framer-motion.js" defer></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap');
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #1a0933, #2e1a47);
-      color: white;
-      overflow-x: hidden;
-      margin: 0;
-    }
-    .glow {
-      box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    #error {
-      display: none;
-      text-align: center;
-      padding: 20px;
-      color: red;
-    }
-    .timeline {
-      position: absolute;
-      left: 20px;
-      top: 0;
-      height: 100%;
-      width: 2px;
-      background: linear-gradient(to bottom, #9333ea, #3b82f6);
-      z-index: 1;
-    }
-    .step-icon {
-      position: absolute;
-      left: -40px;
-      font-size: 2rem;
-      transform: translateY(-50%);
-      z-index: 10;
-    }
-
-    /* Улучшенные медиа-запросы для мобильных устройств */
-    @media (max-width: 768px) {
-      .text-6xl { font-size: 1.5rem !important; }
-      .text-8xl { font-size: 2rem !important; }
-      .text-4xl { font-size: 1.2rem !important; }
-      .text-5xl { font-size: 1.4rem !important; }
-      .text-xl { font-size: 0.9rem !important; }
-      .text-2xl { font-size: 1rem !important; }
-      .text-lg { font-size: 0.85rem !important; }
-
-      .min-h-screen { min-height: 100vh; }
-      .px-6 { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
-      .py-20 { padding-top: 1rem !important; padding-bottom: 1rem !important; }
-      .max-w-4xl, .max-w-6xl { max-width: 100% !important; margin: 0 !important; }
-
-      .navbar {
-        flex-direction: column !important;
-        padding: 1rem 0.5rem !important;
-        text-align: center;
-      }
-      .navbar div { margin-top: 0.5rem; }
-      .navbar a {
-        display: block;
-        margin: 0.5rem 0 !important;
-        font-size: 0.9rem !important;
-      }
-
-      #главная .text-center { padding: 0 0.5rem; }
-      #главная h1 { line-height: 1.2; }
-      #главная a {
-        padding: 0.5rem 1rem !important;
-        font-size: 0.9rem !important;
-        width: 100%;
-        text-align: center;
-      }
-      #главная .max-w-2xl { max-width: 90% !important; }
-
-      .grid-cols-1.md\:grid-cols-3 { grid-template-columns: 1fr !important; }
-      .glass { padding: 0.75rem !important; margin: 0.5rem 0 !important; }
-
-      .step-icon { left: -25px; font-size: 1.5rem; }
-      .glass { padding: 0.75rem !important; margin-left: 1.5rem !important; }
-      .timeline { left: 10px; }
-      .flex.items-center { flex-direction: column !important; align-items: flex-start !important; }
-      .glass p { margin: 0 !important; }
-
-      .flex-wrap { flex-direction: column !important; }
-      .gap-8 { gap: 0.5rem !important; }
-      .max-w-sm { max-width: 100% !important; margin: 0.5rem 0 !important; }
-
-      .py-10 { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
-      .mt-4 { margin-top: 0.5rem !important; }
-
-      /* Новая секция с кнопками */
-      .button-section .glass {
-        padding: 0.5rem !important;
-        margin: 0.25rem 0 !important;
-        text-align: center;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .text-6xl { font-size: 1.2rem !important; }
-      .text-8xl { font-size: 1.5rem !important; }
-      #главная a { padding: 0.4rem 0.8rem !important; }
-      .step-icon { left: -20px; font-size: 1.2rem; }
-      .glass { padding: 0.5rem !important; margin-left: 1rem !important; }
-      .button-section .glass { padding: 0.4rem !important; font-size: 0.8rem !important; }
-    }
-  </style>
-</head>
-<body>
-  <div id="root"></div>
-  <div id="error">Ошибка: Не удалось загрузить приложение. Проверьте консоль браузера для деталей.</div>
-  <script type="text/babel">
-    // Safely access Framer Motion's motion object
-    const motion = window.framerMotion && window.framerMotion.motion ? window.framerMotion.motion : {
-      div: (props) => <div {...props} />,
-      nav: (props) => <nav {...props} />,
-      a: (props) => <a {...props} />,
-      h1: (props) => <h1 {...props} />,
-      h2: (props) => <h2 {...props} />,
-      p: (props) => <p {...props} />,
-    };
-
-    // Error Boundary Component
-    class ErrorBoundary extends React.Component {
-      state = { hasError: false };
-
-      static getDerivedStateFromError(error) {
-        return { hasError: true };
-      }
-
-      componentDidCatch(error, errorInfo) {
-        console.error("React Error:", error, errorInfo);
-      }
-
-      render() {
-        if (this.state.hasError) {
-          return <h1>Что-то пошло не так. Пожалуйста, обновите страницу.</h1>;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIBuddy: Ваш Интеллектуальный Помощник для Текста и Кода</title>
+    <!-- Подключение Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Подключение шрифта Inter из Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* Общие стили */
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+            background-color: #0d1117; /* Темный фон для всей страницы */
+            color: #e6edf3; /* Светлый текст по умолчанию */
         }
-        return this.props.children;
-      }
-    }
 
-    const Navbar = () => {
-      return (
-        <motion.nav
-          initial={window.framerMotion ? { y: -100 } : {}}
-          animate={window.framerMotion ? { y: 0 } : {}}
-          transition={window.framerMotion ? { duration: 0.8, ease: "easeOut" } : {}}
-          className="fixed top-0 left-0 w-full z-50 glass py-4 px-6 flex justify-between items-center navbar"
-        >
-          <motion.div
-            whileHover={window.framerMotion ? { scale: 1.1 } : {}}
-            className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600"
-          >
-            AIBuddy
-          </motion.div>
-          <div className="space-x-6">
-            {['Главная', 'Возможности', 'Как это работает', 'Что умеет', 'Отзывы'].map((item) => (
-              <motion.a
-                key={item}
-                href={`#${item.toLowerCase().replace(' ', '-')}`}
-                whileHover={window.framerMotion ? { scale: 1.2, color: '#9333ea' } : {}}
-                className="text-lg hover:text-purple-400 transition-colors"
-              >
-                {item}
-              </motion.a>
-            ))}
-          </div>
-        </motion.nav>
-      );
-    };
+        /* Стиль для кнопки гамбургер-меню */
+        .hamburger-menu span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: #e6edf3;
+            margin: 5px 0;
+            transition: all 0.3s ease-in-out;
+        }
 
-    const Hero = () => {
-      return (
-        <section id="главная" className="min-h-screen flex items-center justify-center relative overflow-hidden">
-          <motion.div
-            initial={window.framerMotion ? { opacity: 0, y: 50 } : {}}
-            animate={window.framerMotion ? { opacity: 1, y: 0 } : {}}
-            transition={window.framerMotion ? { duration: 1, delay: 0.2 } : {}}
-            className="text-center z-10"
-          >
-            <motion.h1
-              className="text-6xl md:text-8xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500"
-              animate={window.framerMotion ? { scale: [1, 1.05, 1] } : {}}
-              transition={window.framerMotion ? { duration: 2, repeat: Infinity, repeatType: 'reverse' } : {}}
-            >
-              Познакомьтесь с <span className="font-['Space_Grotesk']">AIBuddy</span>
-            </motion.h1>
-            <motion.p
-              initial={window.framerMotion ? { opacity: 0 } : {}}
-              animate={window.framerMotion ? { opacity: 1 } : {}}
-              transition={window.framerMotion ? { delay: 0.4, duration: 1 } : {}}
-              className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto"
-            >
-              Ваш <b>универсальный ИИ-помощник</b> для создания <i>захватывающих историй</i>, написания <b>безупречного кода</b> и вдохновения на <i>креативные идеи</i>.
-            </motion.p>
-            <motion.a
-              href="https://t.me/AIBoddy"
-              whileHover={window.framerMotion ? { scale: 1.1, boxShadow: "0 0 20px rgba(147, 51, 234, 0.8)" } : {}}
-              className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold glow"
-            >
-              Начать общение сейчас
-            </motion.a>
-          </motion.div>
-          <motion.div
-            className="absolute inset-0 z-0"
-            animate={window.framerMotion ? { rotate: 360 } : {}}
-            transition={window.framerMotion ? { duration: 50, repeat: Infinity, ease: 'linear' } : {}}
-          >
-            <div className="w-full h-full bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.2),transparent)]"></div>
-          </motion.div>
-        </section>
-      );
-    };
+        .hamburger-menu.open span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
 
-    const Features = () => {
-      const features = [
-        {
-          title: "Поэтическая проза",
-          description: "Создавайте <b>душевные истории</b>, <i>яркие стихи</i> и <b>увлекательные статьи</b> с ноткой литературного волшебства.",
-          icon: "📜",
-        },
-        {
-          title: "Магия кода",
-          description: "Генерируйте <b>чистый, масштабируемый код</b> на <i>Python, JavaScript, C++</i> и других языках для любых проектов.",
-          icon: "💻",
-        },
-        {
-          title: "Искры гениальности",
-          description: "Разожгите свои идеи с помощью <b>инновационных решений</b> и <i>вдохновляющих инсайтов</i>, созданных специально для вас.",
-          icon: "💡",
-        },
-      ];
+        .hamburger-menu.open span:nth-child(2) {
+            opacity: 0;
+        }
 
-      return (
-        <section id="возможности" className="py-20 px-6">
-          <motion.h2
-            initial={window.framerMotion ? { opacity: 0 } : {}}
-            whileInView={window.framerMotion ? { opacity: 1 } : {}}
-            transition={window.framerMotion ? { duration: 0.8 } : {}}
-            className="text-4xl md:text-5xl font-bold text-center mb-12"
-          >
-            Почему <span className="text-purple-400">AIBuddy</span> сияет
-          </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={window.framerMotion ? { opacity: 0, y: 50 } : {}}
-                whileInView={window.framerMotion ? { opacity: 1, y: 0 } : {}}
-                transition={window.framerMotion ? { duration: 0.5, delay: index * 0.2 } : {}}
-                whileHover={window.framerMotion ? { scale: 1.05, boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)" } : {}}
-                className="glass p-6 rounded-xl text-center"
-              >
-                <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-2xl font-semibold mb-4">{feature.title}</h3>
-                <div className="text-lg" dangerouslySetInnerHTML={{ __html: feature.description }} />
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      );
-    };
+        .hamburger-menu.open span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
 
-    const HowItWorks = () => {
-      const steps = [
-        { text: "Присоединитесь к нашему <b>Telegram-каналу</b>, чтобы разблокировать AIBuddy.", icon: "📲" },
-        { text: "Введите <code>/start</code>, чтобы начать ваше путешествие.", icon: "🚀" },
-        { text: "Просите <b>истории, код или решения</b> — мы доставим!", icon: "✨" },
-      ];
+        /* Анимация плавного появления элементов */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
 
-      return (
-        <section id="как-это-работает" className="py-20 px-6 relative">
-          <motion.h2
-            initial={window.framerMotion ? { opacity: 0 } : {}}
-            whileInView={window.framerMotion ? { opacity: 1 } : {}}
-            transition={window.framerMotion ? { duration: 0.8 } : {}}
-            className="text-4xl md:text-5xl font-bold text-center mb-12"
-          >
-            Как это работает
-          </motion.h2>
-          <div className="relative max-w-4xl mx-auto">
-            <div className="timeline"></div>
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={window.framerMotion ? { opacity: 0, x: index % 2 === 0 ? -50 : 50 } : {}}
-                whileInView={window.framerMotion ? { opacity: 1, x: 0 } : {}}
-                transition={window.framerMotion ? { duration: 0.6, delay: index * 0.3 } : {}}
-                className="flex items-center mb-12 relative"
-                style={{ marginLeft: '40px' }}
-              >
-                <div
-                  className="step-icon"
-                  style={{ top: '50%' }}
-                >
-                  {step.icon}
+        .fade-in-up.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Анимация для кнопок */
+        .btn-primary {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.4);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.7s ease;
+            z-index: -1;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        /* Герой-секция: фон с градиентом и частицами */
+        .hero-bg {
+            background: linear-gradient(135deg, #1f2735 0%, #0d1117 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top left, rgba(31, 100, 150, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at bottom right, rgba(150, 31, 100, 0.3) 0%, transparent 50%);
+            opacity: 0.7;
+            animation: moveGradient 15s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+
+        @keyframes moveGradient {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Стиль для секций с темным фоном */
+        section {
+            background-color: #161b22; /* Оттенок темнее, чем фон body */
+            border-radius: 1rem; /* Закругленные углы для всех секций */
+            margin-bottom: 2rem; /* Отступ между секциями */
+            padding: 2rem; /* Внутренний отступ */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легкая тень */
+        }
+        /* Стили для карточек в секции "Features" */
+        .feature-card {
+            background-color: #0d1117; /* Ещё темнее фон для карточек */
+            border: 1px solid rgba(48, 54, 61, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(31, 100, 150, 0.2), rgba(150, 31, 100, 0.2));
+            transform: scale(0);
+            transition: all 0.4s ease-out;
+            z-index: -1;
+            border-radius: inherit;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 255, 255, 0.2);
+            border-color: #0ff; /* Голубая обводка при наведении */
+        }
+        .feature-card:hover::before {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* Анимация "печатающегося" текста */
+        .typing-effect {
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 0.15em solid orange; /* Имитация курсора */
+            animation: typing 3s steps(40, end) forwards, blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: orange }
+        }
+
+        /* Анимация для "How It Works" */
+        .step-card {
+            background-color: #0d1117;
+            border: 1px solid rgba(48, 54, 61, 0.5);
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Стиль для активной навигационной ссылки */
+        .nav-link.active {
+            color: #0ff; /* Ярко-голубой цвет */
+            border-bottom: 2px solid #0ff; /* Подчеркивание */
+            font-weight: 600;
+        }
+
+        /* Специальные стили для секции "Examples" (для имитации кода) */
+        .code-example-block {
+            background-color: #010409; /* Очень темный фон для кода */
+            border: 1px solid #30363d;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            font-family: 'Cascadia Code', 'Fira Code', 'monospace'; /* Моноширинный шрифт */
+            font-size: 0.9rem;
+            overflow-x: auto; /* Горизонтальная прокрутка для длинных строк */
+            box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.1);
+        }
+        .code-example-block pre {
+            margin: 0;
+            white-space: pre-wrap; /* Перенос строк */
+            word-wrap: break-word;
+        }
+        .code-example-block span {
+            color: #c9d1d9; /* Цвет текста по умолчанию */
+        }
+        .code-example-block .keyword { color: #ff7b72; } /* Красный */
+        .code-example-block .string { color: #a5d6ff; } /* Голубой */
+        .code-example-block .comment { color: #8b949e; } /* Серый */
+        .code-example-block .function { color: #d2a8ff; } /* Фиолетовый */
+        .code-example-block .number { color: #79c0ff; } /* Светло-голубой */
+        .code-example-block .class { color: #f0e68c; } /* Желтый */
+
+        /* Стиль для изображений в секции Examples */
+        .example-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+        .example-image:hover {
+            transform: scale(1.02);
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+
+    <!-- Header / Навигация -->
+    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300 bg-transparent text-white py-4 shadow-md">
+        <nav class="container mx-auto px-4 flex justify-between items-center">
+            <a href="#home" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-600 hover:scale-105 transition-transform duration-300">
+                AIBuddy
+            </a>
+            <div class="hidden md:flex space-x-6">
+                <a href="#home" class="nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md">Главная</a>
+                <a href="#features" class="nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md">Возможности</a>
+                <a href="#how-it-works" class="nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md">Как это работает</a>
+                <a href="#examples" class="nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md">Примеры</a>
+                <a href="#about" class="nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md">О боте</a>
+                <a href="#contact" class="nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md">Контакты</a>
+            </div>
+            <a href="https://t.me/AIBoddy" target="_blank" class="hidden md:block btn-primary bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                Попробовать AIBuddy
+            </a>
+            <div class="md:hidden">
+                <button id="hamburger" class="hamburger-menu p-2 rounded-md focus:outline-none">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </nav>
+        <!-- Мобильное меню -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-gray-900 text-white py-4 shadow-lg transition-all duration-300 transform -translate-y-full opacity-0">
+            <div class="flex flex-col items-center space-y-4">
+                <a href="#home" class="mobile-nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md w-full text-center">Главная</a>
+                <a href="#features" class="mobile-nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md w-full text-center">Возможности</a>
+                <a href="#how-it-works" class="mobile-nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md w-full text-center">Как это работает</a>
+                <a href="#examples" class="mobile-nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md w-full text-center">Примеры</a>
+                <a href="#about" class="mobile-nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md w-full text-center">О боте</a>
+                <a href="#contact" class="mobile-nav-link text-lg hover:text-cyan-400 transition-colors duration-200 p-2 rounded-md w-full text-center">Контакты</a>
+                <a href="https://t.me/AIBoddy" target="_blank" class="btn-primary bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold py-2 px-6 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-1 w-auto">
+                    Попробовать AIBuddy
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section / Главная секция -->
+        <section id="home" class="hero-bg min-h-screen flex items-center justify-center text-center px-4 relative z-10">
+            <div class="relative z-10 max-w-4xl mx-auto py-20 animate-fade-in-up">
+                <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6 text-white tracking-tight">
+                    AIBuddy: Ваш <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">Интеллектуальный Партнер</span> для Текста и Кода
+                </h1>
+                <p class="text-lg md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto animate-fade-in-up delay-200 typing-effect">
+                    Воплощайте свои самые смелые идеи в жизнь с помощью ИИ.
+                </p>
+                <div class="space-x-4 flex flex-col md:flex-row justify-center items-center gap-4 animate-fade-in-up delay-400">
+                    <a href="https://t.me/AIBoddy" target="_blank" class="btn-primary bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold py-3 px-8 rounded-full shadow-xl text-lg transition-all duration-300 ease-in-out transform hover:scale-105">
+                        Начать сейчас <i class="fa-solid fa-telegram ml-2"></i>
+                    </a>
+                    <a href="#features" class="btn-secondary border border-gray-600 text-gray-200 hover:border-cyan-400 hover:text-cyan-400 font-semibold py-3 px-8 rounded-full shadow-md text-lg transition-all duration-300 ease-in-out transform hover:scale-105">
+                        Узнать больше <i class="fa-solid fa-arrow-down ml-2"></i>
+                    </a>
                 </div>
-                <div className="glass p-6 rounded-xl flex-1 w-full ml-10">
-                  <p className="text-lg" dangerouslySetInnerHTML={{ __html: step.text }} />
+            </div>
+        </section>
+
+        <!-- Features Section / Секция "Возможности" -->
+        <section id="features" class="container mx-auto px-4 py-16 animate-fade-in-up delay-600">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 text-white">
+                Откройте для себя <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-600">возможности</span> AIBuddy
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Карточка возможности 1: Создание текстов -->
+                <div class="feature-card p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-fade-in-up delay-700">
+                    <div class="text-5xl text-blue-400 mb-4 text-center">
+                        <i class="fa-solid fa-pen-fancy"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-3 text-center">Искусный Писатель и Поэт</h3>
+                    <p class="text-gray-300 text-center">AIBuddy создает <b>глубокие, эмоционально насыщенные тексты</b>, которые <b>цепляют с первых строк</b>. Мои слова — это <b>симфония метафор, сравнений и ярких образов</b>, которые оставляют след в душе. Я пишу <b>стихи, прозу, статьи, сценарии</b> — всё, что вдохновляет и увлекает.</p>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+                <!-- Карточка возможности 2: Генерация кода -->
+                <div class="feature-card p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-fade-in-up delay-800">
+                    <div class="text-5xl text-green-400 mb-4 text-center">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-3 text-center">Виртуозный Программист</h3>
+                    <p class="text-gray-300 text-center">Я <b>виртуозно владею программированием</b> — от простых скриптов до сложных алгоритмов. Мой код <b>чистый, эффективный и масштабируемый</b>, готов решать задачи любой сложности. Я работаю с <b>Python, JavaScript, C++, Java</b> и многими другими языками, создавая <b>рабочие, оптимизированные решения</b>.</p>
+                </div>
+                <!-- Карточка возможности 3: Математические вычисления -->
+                <div class="feature-card p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-fade-in-up delay-900">
+                    <div class="text-5xl text-purple-400 mb-4 text-center">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-3 text-center">Математик и Решатель Задач</h3>
+                    <p class="text-gray-300 text-center">Помогу с <b>математическими вычислениями</b> и объяснениями в <b>простом текстовом формате</b>. Я способен вдохновлять, поддерживать и помогать в любых творческих и технических начинаниях. <b>Готов к работе!</b></p>
+                </div>
+                 <!-- Карточка возможности 4: Поддержка и вдохновение -->
+                <div class="feature-card p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-fade-in-up delay-1000">
+                    <div class="text-5xl text-yellow-400 mb-4 text-center">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-3 text-center">Вдохновение и Поддержка</h3>
+                    <p class="text-gray-300 text-center">AIBuddy не просто выполняет задачи, но и <b>вдохновляет</b>! Получайте креативные идеи, новые перспективы и <b>поддержку</b> в ваших самых амбициозных проектах. Мы поможем <b>превзойти ваши ожидания</b>.</p>
+                </div>
+                <!-- Карточка возможности 5: Оптимизация и эффективность -->
+                <div class="feature-card p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-fade-in-up delay-1100">
+                    <div class="text-5xl text-pink-400 mb-4 text-center">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-3 text-center">Оптимизация и Скорость</h3>
+                    <p class="text-gray-300 text-center">Мои алгоритмы разработаны для <b>максимальной производительности</b>. Получайте ответы и решения <b>быстро и эффективно</b>, не теряя при этом в качестве. AIBuddy всегда стремится к <b>безупречному результату</b>.</p>
+                </div>
+                <!-- Карточка возможности 6: Кросс-платформенность -->
+                <div class="feature-card p-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-300 animate-fade-in-up delay-1200">
+                    <div class="text-5xl text-red-400 mb-4 text-center">
+                        <i class="fa-solid fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-white mb-3 text-center">Доступность 24/7</h3>
+                    <p class="text-gray-300 text-center">AIBuddy всегда под рукой в Telegram. Доступен с любого устройства, <b>в любое время</b>. Ваш персональный ассистент всегда готов помочь, когда вам это нужно, <b>где бы вы ни находились</b>.</p>
+                </div>
+            </div>
         </section>
-      );
-    };
 
-    const WhatItCanDo = () => {
-      const capabilities = [
-        { title: "Поэтическая проза", description: "Создавайте душевные истории, яркие стихи и увлекательные статьи с ноткой литературного волшебства.", icon: "📜" },
-        { title: "Магия кода", description: "Генерируйте чистый, масштабируемый код на Python, JavaScript, C++ и других языках для любых проектов.", icon: "💻" },
-      ];
-
-      return (
-        <section id="что-умеет" className="py-20 px-6">
-          <motion.h2
-            initial={window.framerMotion ? { opacity: 0 } : {}}
-            whileInView={window.framerMotion ? { opacity: 1 } : {}}
-            transition={window.framerMotion ? { duration: 0.8 } : {}}
-            className="text-4xl md:text-5xl font-bold text-center mb-12"
-          >
-            Познакомьтесь с AIBuddy знает
-          </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto button-section">
-            {capabilities.map((capability, index) => (
-              <motion.div
-                key={capability.title}
-                initial={window.framerMotion ? { opacity: 0, y: 50 } : {}}
-                whileInView={window.framerMotion ? { opacity: 1, y: 0 } : {}}
-                transition={window.framerMotion ? { duration: 0.5, delay: index * 0.2 } : {}}
-                whileHover={window.framerMotion ? { scale: 1.05, boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)" } : {}}
-                className="glass p-6 rounded-xl text-center"
-              >
-                <div className="text-4xl mb-4">{capability.icon}</div>
-                <h3 className="text-2xl font-semibold mb-4">{capability.title}</h3>
-                <p className="text-lg" dangerouslySetInnerHTML={{ __html: capability.description }} />
-              </motion.div>
-            ))}
-          </div>
+        <!-- How It Works Section / Секция "Как это работает" -->
+        <section id="how-it-works" class="container mx-auto px-4 py-16 animate-fade-in-up">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 text-white">
+                Как <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">работает</span> AIBuddy
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center justify-center">
+                <!-- Шаг 1 -->
+                <div class="step-card p-6 rounded-xl shadow-lg text-center transform hover:scale-103 transition-all duration-300 animate-fade-in-up delay-1300">
+                    <div class="text-6xl text-cyan-400 mb-4">1</div>
+                    <h3 class="text-2xl font-semibold text-white mb-3">Ваш Запрос</h3>
+                    <p class="text-gray-300">Просто напишите или отправьте голосовое сообщение AIBuddy в Telegram. Опишите свою задачу, будь то написание текста, генерация кода или решение математической проблемы.</p>
+                </div>
+                <!-- Иконка Стрелки для десктопа -->
+                <div class="hidden md:flex justify-center items-center text-5xl text-gray-500 animate-pulse delay-1400">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+                <!-- Иконка Стрелки для мобильного -->
+                <div class="flex md:hidden justify-center items-center text-5xl text-gray-500 rotate-90 animate-pulse delay-1400">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+                <!-- Шаг 2 -->
+                <div class="step-card p-6 rounded-xl shadow-lg text-center transform hover:scale-103 transition-all duration-300 animate-fade-in-up delay-1500">
+                    <div class="text-6xl text-cyan-400 mb-4">2</div>
+                    <h3 class="text-2xl font-semibold text-white mb-3">Обработка ИИ</h3>
+                    <p class="text-gray-300">Мощные алгоритмы AIBuddy анализируют ваш запрос, используя передовые модели ИИ для понимания контекста, творчества и обеспечения максимальной точности.</p>
+                </div>
+                <!-- Иконка Стрелки для десктопа -->
+                <div class="hidden md:flex justify-center items-center text-5xl text-gray-500 animate-pulse delay-1600">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+                <!-- Иконка Стрелки для мобильного -->
+                <div class="flex md:hidden justify-center items-center text-5xl text-gray-500 rotate-90 animate-pulse delay-1600">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
+                <!-- Шаг 3 -->
+                <div class="step-card p-6 rounded-xl shadow-lg text-center transform hover:scale-103 transition-all duration-300 animate-fade-in-up delay-1700">
+                    <div class="text-6xl text-cyan-400 mb-4">3</div>
+                    <h3 class="text-2xl font-semibold text-white mb-3">Мгновенный Результат</h3>
+                    <p class="text-gray-300">AIBuddy моментально генерирует и отправляет вам идеально оформленный текст, безупречный код или точное решение, прямо в чат Telegram. Ваши идеи воплощаются в реальность!</p>
+                </div>
+            </div>
         </section>
-      );
-    };
 
-    const Testimonials = () => {
-      const testimonials = [
-        {
-          name: "Алекс",
-          text: "AIBuddy написал <b>потрясающее стихотворение</b> для моего мероприятия. Все были тронуты!",
-          avatar: "🧑‍🚀",
-        },
-        {
-          name: "Мария",
-          text: "Код от AIBuddy был <b>чистым и эффективным</b>. Сэкономил мне часы работы!",
-          avatar: "👩‍💻",
-        },
-        {
-          name: "Сэм",
-          text: "Креативность AIBuddy невероятна. Мои идеи для проектов теперь <b>процветают</b>!",
-          avatar: "🎨",
-        },
-      ];
+        <!-- Examples Section / Секция "Примеры" -->
+        <section id="examples" class="container mx-auto px-4 py-16 animate-fade-in-up">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 text-white">
+                AIBuddy <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-green-600">в действии</span>
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Пример текста -->
+                <div class="p-6 rounded-xl shadow-xl bg-gray-800 border border-gray-700 animate-fade-in-up delay-1800">
+                    <h3 class="text-3xl font-semibold text-white mb-6 text-center"><i class="fa-solid fa-scroll text-blue-400 mr-3"></i>Пример Генерации Текста: Поэзия</h3>
+                    <div class="bg-gray-900 p-6 rounded-lg text-gray-200 leading-relaxed italic text-lg shadow-inner border border-gray-700">
+                        <p class="mb-4">
+                            "В тумане мыслей, где рождались сны, <br>
+                            Бродил поэт, искал он путь к весне.<br>
+                            И каждое дыханье, каждый миг<br>
+                            Он превращал в волшебный, дивный стих."
+                        </p>
+                        <p>
+                            "Так AIBuddy, как незримый гений,<br>
+                            Творит миры из слов, без сожалений.<br>
+                            И в каждой строчке, что выходит из-под пера,<br>
+                            Звучит гармония, магия и игра."
+                        </p>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-4 text-right"><i>— Сгенерировано AIBuddy</i></p>
+                </div>
 
-      return (
-        <section id="отзывы" className="py-20 px-6 bg-gray-900">
-          <motion.h2
-            initial={window.framerMotion ? { opacity: 0 } : {}}
-            whileInView={window.framerMotion ? { opacity: 1 } : {}}
-            transition={window.framerMotion ? { duration: 0.8 } : {}}
-            className="text-4xl md:text-5xl font-bold mb-12 text-center"
-          >
-            Что пользователи любят в нас
-          </motion.h2>
-          <div className="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                initial={window.framerMotion ? { opacity: 0, scale: 0.8 } : {}}
-                whileInView={window.framerMotion ? { opacity: 1, scale: 1 } : {}}
-                transition={window.framerMotion ? { duration: 0.5, delay: index * 0.2 } : {}}
-                whileHover={window.framerMotion ? { scale: 1.05 } : {}}
-                className="glass p-6 rounded-xl max-w-sm text-center"
-              >
-                <div className="text-5xl mb-4">{testimonial.avatar}</div>
-                <p className="text-lg mb-4" dangerouslySetInnerHTML={{ __html: testimonial.text }} />
-                <p className="font-semibold text-purple-400">{testimonial.name}</p>
-              </motion.div>
-            ))}
-          </div>
+                <!-- Пример кода -->
+                <div class="p-6 rounded-xl shadow-xl bg-gray-800 border border-gray-700 animate-fade-in-up delay-1900">
+                    <h3 class="text-3xl font-semibold text-white mb-6 text-center"><i class="fa-solid fa-terminal text-green-400 mr-3"></i>Пример Генерации Кода: Python</h3>
+                    <div class="code-example-block">
+<pre><code>
+<span class="comment"># Функция для вычисления факториала числа</span>
+<span class="keyword">def</span> <span class="function">factorial</span>(<span class="class">n</span>):
+    <span class="keyword">if</span> <span class="class">n</span> == <span class="number">0</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    <span class="keyword">else</span>:
+        <span class="keyword">return</span> <span class="class">n</span> * <span class="function">factorial</span>(<span class="class">n</span> - <span class="number">1</span>)
+
+<span class="comment"># Пример использования</span>
+<span class="class">num</span> = <span class="number">5</span>
+<span class="keyword">print</span>(<span class="string">f"Факториал {num} равен: {factorial(num)}"</span>)
+
+<span class="comment"># Вывод: Факториал 5 равен: 120</span>
+</code></pre>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-4 text-right"><i>— Сгенерировано AIBuddy</i></p>
+                </div>
+
+                <!-- Пример решения математической задачи -->
+                <div class="lg:col-span-2 p-6 rounded-xl shadow-xl bg-gray-800 border border-gray-700 animate-fade-in-up delay-2000">
+                    <h3 class="text-3xl font-semibold text-white mb-6 text-center"><i class="fa-solid fa-square-root-alt text-purple-400 mr-3"></i>Пример Решения Математической Задачи</h3>
+                    <div class="bg-gray-900 p-6 rounded-lg text-gray-200 leading-relaxed shadow-inner border border-gray-700">
+                        <h4 class="text-xl font-medium text-white mb-3">Задача:</h4>
+                        <p class="mb-4">Вычислите значение выражения $$(2x^2 + 3y) / (4z)$$ при $$x=5$$, $$y=2$$, $$z=10$$.</p>
+
+                        <h4 class="text-xl font-medium text-white mb-3">Решение AIBuddy:</h4>
+                        <div class="code-example-block">
+<pre><code>
+<span class="comment"># Заданные значения переменных</span>
+<span class="class">x</span> = 5
+<span class="class">y</span> = 2
+<span class="class">z</span> = 10
+
+<span class="comment"># Шаг 1: Вычисляем числитель</span>
+<span class="class">numerator</span> = (2 * (<span class="class">x</span>**2)) + (3 * <span class="class">y</span>)
+<span class="comment"># numerator = (2 * (5^2)) + (3 * 2) = (2 * 25) + 6 = 50 + 6 = 56</span>
+
+<span class="comment"># Шаг 2: Вычисляем знаменатель</span>
+<span class="class">denominator</span> = 4 * <span class="class">z</span>
+<span class="comment"># denominator = 4 * 10 = 40</span>
+
+<span class="comment"># Шаг 3: Делим числитель на знаменатель</span>
+<span class="class">result</span> = <span class="class">numerator</span> / <span class="class">denominator</span>
+<span class="comment"># result = 56 / 40 = 1.4</span>
+
+<span class="keyword">print</span>(<span class="string">f"Значение выражения: {result}"</span>)
+<span class="comment"># Вывод: Значение выражения: 1.4</span>
+</code></pre>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-4 text-right"><i>— Сгенерировано AIBuddy</i></p>
+                </div>
+
+            </div>
         </section>
-      );
-    };
 
-    const Footer = () => (
-      <footer className="py-10 text-center">
-        <motion.p
-          initial={window.framerMotion ? { opacity: 0 } : {}}
-          animate={window.framerMotion ? { opacity: 1 } : {}}
-          transition={window.framerMotion ? { duration: 1 } : {}}
-        >
-          © 2025 AIBuddy. Создано с <span className="text-red-500">❤️</span> для творчества и инноваций.
-        </motion.p>
-        <motion.a
-          href="https://t.me/AIBoddy"
-          whileHover={window.framerMotion ? { scale: 1.1 } : {}}
-          className="inline-block mt-4 text-purple-400"
-        >
-          Присоединяйтесь к нашему Telegram-каналу
-        </motion.a>
-      </footer>
-    );
 
-    const App = () => {
-      return (
-        <ErrorBoundary>
-          <div>
-            <Navbar />
-            <Hero />
-            <Features />
-            <HowItWorks />
-            <WhatItCanDo />
-            <Testimonials />
-            <Footer />
-          </div>
-        </ErrorBoundary>
-      );
-    };
+        <!-- About AIBuddy Section / Секция "О AIBuddy" -->
+        <section id="about" class="container mx-auto px-4 py-16 animate-fade-in-up">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 text-white">
+                История <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-600">AIBuddy</span>
+            </h2>
+            <div class="max-w-3xl mx-auto text-lg text-gray-300 leading-relaxed text-center">
+                <p class="mb-6">
+                    AIBuddy был задуман с единственной целью: стать вашим самым надежным и креативным ИИ-компаньоном. Мы верим в использование силы передового искусственного интеллекта для расширения человеческого творчества и продуктивности.
+                </p>
+                <p class="mb-6">
+                    Наши основные принципы руководят каждым взаимодействием: <b>красота в выражении, точность в исполнении и стремление превзойти ваши ожидания</b>. Мы постоянно работаем над тем, чтобы AIBuddy был на переднем крае инноваций, предлагая вам лучшие возможности генерации текста и кода.
+                </p>
+                <p>
+                    AIBuddy построен на базе передовых моделей Mistral AI, что позволяет ему глубоко понимать запросы и генерировать высококачественные, релевантные и творческие ответы. Мы здесь, чтобы помочь вам воплотить любую идею в реальность.
+                </p>
+            </div>
+        </section>
 
-    try {
-      const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(<App />);
-    } catch (error) {
-      console.error('Failed to render React app:', error);
-      document.getElementById('error').style.display = 'block';
-    }
-  </script>
+        <!-- Call to Action Section / Секция призыва к действию -->
+        <section id="contact" class="container mx-auto px-4 py-16 text-center animate-fade-in-up">
+            <h2 class="text-4xl md:text-5xl font-bold mb-8 text-white">
+                Готовы <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-600">воплотить идеи</span> в реальность?
+            </h2>
+            <p class="text-xl md:text-2xl text-gray-300 mb-10 max-w-2xl mx-auto">
+                Присоединяйтесь к тысячам создателей и разработчиков, которые доверяют AIBuddy.
+            </p>
+            <a href="https://t.me/AIBoddy" target="_blank" class="btn-primary bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white font-bold py-4 px-12 rounded-full shadow-2xl text-xl transition-all duration-300 ease-in-out transform hover:scale-105">
+                Попробовать AIBuddy сейчас! <i class="fa-solid fa-paper-plane ml-3"></i>
+            </a>
+        </section>
+    </main>
+
+    <!-- Footer / Футер -->
+    <footer class="bg-gray-900 text-gray-400 py-10 px-4 border-t border-gray-700">
+        <div class="container mx-auto text-center">
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="https://t.me/AIBoddy" target="_blank" class="text-3xl hover:text-cyan-400 transition-colors duration-200 transform hover:scale-110"><i class="fa-brands fa-telegram"></i></a>
+                <a href="#" target="_blank" class="text-3xl hover:text-cyan-400 transition-colors duration-200 transform hover:scale-110"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#" target="_blank" class="text-3xl hover:text-cyan-400 transition-colors duration-200 transform hover:scale-110"><i class="fa-brands fa-github"></i></a>
+            </div>
+            <p class="text-sm mb-4">© 2025 AIBuddy. Все права защищены.</p>
+            <div class="flex justify-center space-x-4 text-sm">
+                <a href="#" class="hover:text-cyan-400 transition-colors duration-200">Политика конфиденциальности</a>
+                <a href="#" class="hover:text-cyan-400 transition-colors duration-200">Условия использования</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // JavaScript для анимаций и функциональности
+
+        // 1. Анимация появления при скролле (Intersection Observer)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-fade-in-up').forEach(element => {
+            observer.observe(element);
+        });
+
+        // 2. Смена цвета навбара при скролле
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.remove('bg-transparent', 'shadow-md');
+                navbar.classList.add('bg-gray-900', 'bg-opacity-95', 'shadow-lg');
+            } else {
+                navbar.classList.remove('bg-gray-900', 'bg-opacity-95', 'shadow-lg');
+                navbar.classList.add('bg-transparent', 'shadow-md');
+            }
+        });
+
+        // 3. Плавный скролл для навигационных ссылок
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Закрыть мобильное меню, если оно открыто
+                const mobileMenu = document.getElementById('mobile-menu');
+                const hamburger = document.getElementById('hamburger');
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden', 'transform', '-translate-y-full', 'opacity-0');
+                    hamburger.classList.remove('open');
+                }
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // 4. Гамбургер-меню для мобильных устройств
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        hamburger.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('transform');
+            mobileMenu.classList.toggle('-translate-y-full');
+            mobileMenu.classList.toggle('opacity-0');
+            hamburger.classList.toggle('open');
+
+            // Задержка для анимации, затем добавление/удаление классов для отображения
+            setTimeout(() => {
+                mobileMenu.classList.toggle('translate-y-0');
+                mobileMenu.classList.toggle('opacity-100');
+            }, 50); // Небольшая задержка, чтобы transition сработал
+        });
+
+        // Закрытие мобильного меню при клике на ссылку внутри него
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden', 'transform', '-translate-y-full', 'opacity-0');
+                hamburger.classList.remove('open');
+            });
+        });
+
+        // 5. Активное состояние для навигационных ссылок (опционально, требует доработки для точного определения текущей секции)
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+        const highlightNavLink = () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - navbar.offsetHeight; // Учитываем высоту навбара
+                if (scrollY >= sectionTop) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.href.includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+            mobileNavLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.href.includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', highlightNavLink);
+        document.addEventListener('DOMContentLoaded', highlightNavLink); // Установить активную ссылку при загрузке страницы
+    </script>
 </body>
 </html>

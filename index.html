@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIBuddy - Ваш Креативный ИИ-Помощник</title>
+  <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" defer></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js" defer></script>
+  <script src="https://unpkg.com/@babel/standalone@7.22.9/babel.min.js" defer></script>
+  <script src="https://unpkg.com/framer-motion@10.18.0/dist/framer-motion.js" defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Space+Grotesk:wght@700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1a0933, #2e1a47);
+      color: white;
+      overflow-x: hidden;
+    }
+    .glow {
+      box-shadow: 0 0 20px rgba(147, 51, 234, 0.5);
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    #error {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: red;
+    }
+    .timeline {
+      position: absolute;
+      left: 20px;
+      top: 0;
+      height: 100%;
+      width: 2px;
+      background: linear-gradient(to bottom, #9333ea, #3b82f6);
+      z-index: 1;
+    }
+    .step-icon {
+      position: absolute;
+      left: -40px; /* Adjusted to place icon to the left of the glass box */
+      font-size: 2rem;
+      transform: translateY(-50%);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div id="error">Ошибка: Не удалось загрузить приложение. Проверьте консоль браузера для деталей.</div>
+  <script type="text/babel">
+    // Safely access Framer Motion's motion object
+    const motion = window.framerMotion && window.framerMotion.motion ? window.framerMotion.motion : {
+      div: (props) => <div {...props} />,
+      nav: (props) => <nav {...props} />,
+      a: (props) => <a {...props} />,
+      h1: (props) => <h1 {...props} />,
+      h2: (props) => <h2 {...props} />,
+      p: (props) => <p {...props} />,
+    };
+
+    // Error Boundary Component
+    class ErrorBoundary extends React.Component {
+      state = { hasError: false };
+
+      static getDerivedStateFromError(error) {
+        return { hasError: true };
+      }
+
+      componentDidCatch(error, errorInfo) {
+        console.error("React Error:", error, errorInfo);
+      }
+
+      render() {
+        if (this.state.hasError) {
+          return <h1>Что-то пошло не так. Пожалуйста, обновите страницу.</h1>;
+        }
+        return this.props.children;
+      }
+    }
+
+    const Navbar = () => {
+      return (
+        <motion.nav
+          initial={window.framerMotion ? { y: -100 } : {}}
+          animate={window.framerMotion ? { y: 0 } : {}}
+          transition={window.framerMotion ? { duration: 0.8, ease: "easeOut" } : {}}
+          className="fixed top-0 left-0 w-full z-50 glass py-4 px-6 flex justify-between items-center"
+        >
+          <motion.div
+            whileHover={window.framerMotion ? { scale: 1.1 } : {}}
+            className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600"
+          >
+            AIBuddy
+          </motion.div>
+          <div className="space-x-6">
+            {['Главная', 'Возможности', 'Как это работает', 'Отзывы'].map((item) => (
+              <motion.a
+                key={item}
+                href={`#${item.toLowerCase().replace(' ', '-')}`}
+                whileHover={window.framerMotion ? { scale: 1.2, color: '#9333ea' } : {}}
+                className="text-lg hover:text-purple-400 transition-colors"
+              >
+                {item}
+              </motion.a>
+            ))}
+          </div>
+        </motion.nav>
+      );
+    };
+
+    const Hero = () => {
+      return (
+        <section id="главная" className="min-h-screen flex items-center justify-center relative overflow-hidden">
+          <motion.div
+            initial={window.framerMotion ? { opacity: 0, y: 50 } : {}}
+            animate={window.framerMotion ? { opacity: 1, y: 0 } : {}}
+            transition={window.framerMotion ? { duration: 1, delay: 0.2 } : {}}
+            className="text-center z-10"
+          >
+            <motion.h1
+              className="text-6xl md:text-8xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500"
+              animate={window.framerMotion ? { scale: [1, 1.05, 1] } : {}}
+              transition={window.framerMotion ? { duration: 2, repeat: Infinity, repeatType: 'reverse' } : {}}
+            >
+              Познакомьтесь с <span className="font-['Space_Grotesk']">AIBuddy</span>
+            </motion.h1>
+            <motion.p
+              initial={window.framerMotion ? { opacity: 0 } : {}}
+              animate={window.framerMotion ? { opacity: 1 } : {}}
+              transition={window.framerMotion ? { delay: 0.4, duration: 1 } : {}}
+              className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto"
+            >
+              Ваш <b>универсальный ИИ-помощник</b> для создания <i>захватывающих историй</i>, написания <b>безупречного кода</b> и вдохновения на <i>креативные идеи</i>.
+            </motion.p>
+            <motion.a
+              href="https://t.me/AIBoddy"
+              whileHover={window.framerMotion ? { scale: 1.1, boxShadow: "0 0 20px rgba(147, 51, 234, 0.8)" } : {}}
+              className="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold glow"
+            >
+              Начать общение сейчас
+            </motion.a>
+          </motion.div>
+          <motion.div
+            className="absolute inset-0 z-0"
+            animate={window.framerMotion ? { rotate: 360 } : {}}
+            transition={window.framerMotion ? { duration: 50, repeat: Infinity, ease: 'linear' } : {}}
+          >
+            <div className="w-full h-full bg-[radial-gradient(circle_at_center,rgba(147,51,234,0.2),transparent)]"></div>
+          </motion.div>
+        </section>
+      );
+    };
+
+    const Features = () => {
+      const features = [
+        {
+          title: "Поэтическая проза",
+          description: "Создавайте <b>душевные истории</b>, <i>яркие стихи</i> и <b>увлекательные статьи</b> с ноткой литературного волшебства.",
+          icon: "📜",
+        },
+        {
+          title: "Магия кода",
+          description: "Генерируйте <b>чистый, масштабируемый код</b> на <i>Python, JavaScript, C++</i> и других языках для любых проектов.",
+          icon: "💻",
+        },
+        {
+          title: "Искры гениальности",
+          description: "Разожгите свои идеи с помощью <b>инновационных решений</b> и <i>вдохновляющих инсайтов</i>, созданных специально для вас.",
+          icon: "💡",
+        },
+      ];
+
+      return (
+        <section id="возможности" className="py-20 px-6">
+          <motion.h2
+            initial={window.framerMotion ? { opacity: 0 } : {}}
+            whileInView={window.framerMotion ? { opacity: 1 } : {}}
+            transition={window.framerMotion ? { duration: 0.8 } : {}}
+            className="text-4xl md:text-5xl font-bold text-center mb-12"
+          >
+            Почему <span className="text-purple-400">AIBuddy</span> сияет
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={window.framerMotion ? { opacity: 0, y: 50 } : {}}
+                whileInView={window.framerMotion ? { opacity: 1, y: 0 } : {}}
+                transition={window.framerMotion ? { duration: 0.5, delay: index * 0.2 } : {}}
+                whileHover={window.framerMotion ? { scale: 1.05, boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)" } : {}}
+                className="glass p-6 rounded-xl text-center"
+              >
+                <div className="text-4xl mb-4">{feature.icon}</div>
+                <h3 className="text-2xl font-semibold mb-4">{feature.title}</h3>
+                <div className="text-lg" dangerouslySetInnerHTML={{ __html: feature.description }} />
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      );
+    };
+
+    const HowItWorks = () => {
+      const steps = [
+        { text: "Присоединитесь к нашему <b>Telegram-каналу</b>, чтобы разблокировать AIBuddy.", icon: "📲" },
+        { text: "Введите <code>/start</code>, чтобы начать ваше путешествие.", icon: "🚀" },
+        { text: "Просите <b>истории, код или решения</b> — мы доставим!", icon: "✨" },
+      ];
+
+      return (
+        <section id="как-это-работает" className="py-20 px-6 relative">
+          <motion.h2
+            initial={window.framerMotion ? { opacity: 0 } : {}}
+            whileInView={window.framerMotion ? { opacity: 1 } : {}}
+            transition={window.framerMotion ? { duration: 0.8 } : {}}
+            className="text-4xl md:text-5xl font-bold text-center mb-12"
+          >
+            Как это работает
+          </motion.h2>
+          <div className="relative max-w-4xl mx-auto">
+            <div className="timeline"></div>
+            {steps.map((step, index) => (
+              <motion.div
+                key={index}
+                initial={window.framerMotion ? { opacity: 0, x: index % 2 === 0 ? -50 : 50 } : {}}
+                whileInView={window.framerMotion ? { opacity: 1, x: 0 } : {}}
+                transition={window.framerMotion ? { duration: 0.6, delay: index * 0.3 } : {}}
+                className="flex items-center mb-12 relative"
+                style={{ marginLeft: '40px' }}
+              >
+                <div
+                  className="step-icon"
+                  style={{ top: '50%' }}
+                >
+                  {step.icon}
+                </div>
+                <div className="glass p-6 rounded-xl flex-1 w-full ml-10">
+                  <p className="text-lg" dangerouslySetInnerHTML={{ __html: step.text }} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      );
+    };
+
+    const Testimonials = () => {
+      const testimonials = [
+        {
+          name: "Алекс",
+          text: "AIBuddy написал <b>потрясающее стихотворение</b> для моего мероприятия. Все были тронуты!",
+          avatar: "🧑‍🚀",
+        },
+        {
+          name: "Мария",
+          text: "Код от AIBuddy был <b>чистым и эффективным</b>. Сэкономил мне часы работы!",
+          avatar: "👩‍💻",
+        },
+        {
+          name: "Сэм",
+          text: "Креативность AIBuddy невероятна. Мои идеи для проектов теперь <b>процветают</b>!",
+          avatar: "🎨",
+        },
+      ];
+
+      return (
+        <section id="отзывы" className="py-20 px-6 bg-gray-900">
+          <motion.h2
+            initial={window.framerMotion ? { opacity: 0 } : {}}
+            whileInView={window.framerMotion ? { opacity: 1 } : {}}
+            transition={window.framerMotion ? { duration: 0.8 } : {}}
+            className="text-4xl md:text-5xl font-bold mb-12 text-center"
+          >
+            Что пользователи любят в нас
+          </motion.h2>
+          <div className="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={testimonial.name}
+                initial={window.framerMotion ? { opacity: 0, scale: 0.8 } : {}}
+                whileInView={window.framerMotion ? { opacity: 1, scale: 1 } : {}}
+                transition={window.framerMotion ? { duration: 0.5, delay: index * 0.2 } : {}}
+                whileHover={window.framerMotion ? { scale: 1.05 } : {}}
+                className="glass p-6 rounded-xl max-w-sm text-center"
+              >
+                <div className="text-5xl mb-4">{testimonial.avatar}</div>
+                <p className="text-lg mb-4" dangerouslySetInnerHTML={{ __html: testimonial.text }} />
+                <p className="font-semibold text-purple-400">{testimonial.name}</p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      );
+    };
+
+    const Footer = () => (
+      <footer className="py-10 text-center">
+        <motion.p
+          initial={window.framerMotion ? { opacity: 0 } : {}}
+          animate={window.framerMotion ? { opacity: 1 } : {}}
+          transition={window.framerMotion ? { duration: 1 } : {}}
+        >
+          © 2025 AIBuddy. Создано с <span className="text-red-500">❤️</span> для творчества и инноваций.
+        </motion.p>
+        <motion.a
+          href="https://t.me/AIBoddy"
+          whileHover={window.framerMotion ? { scale: 1.1 } : {}}
+          className="inline-block mt-4 text-purple-400"
+        >
+          Присоединяйтесь к нашему Telegram-каналу
+        </motion.a>
+      </footer>
+    );
+
+    const App = () => {
+      return (
+        <ErrorBoundary>
+          <div>
+            <Navbar />
+            <Hero />
+            <Features />
+            <HowItWorks />
+            <Testimonials />
+            <Footer />
+          </div>
+        </ErrorBoundary>
+      );
+    };
+
+    try {
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+    } catch (error) {
+      console.error('Failed to render React app:', error);
+      document.getElementById('error').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
